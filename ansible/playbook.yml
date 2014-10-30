@@ -1,0 +1,44 @@
+#########################
+# roles/php-mongo/tasks/main
+#########################
+- hosts: all
+  remote_user: vagrant
+  sudo: true
+  tasks:
+
+  - name: install deps
+    apt: package={{item}} state=present update_cache=yes
+    with_items:
+    - mongodb
+    - gcc
+    - php5-dev
+  #  - php-pear
+
+  - name: set pecl php.ini location
+    shell: pecl config-set php_ini /etc/php.ini
+
+  - name: determine php extensions directory
+    shell: php -i | grep -i '^extension_dir' | awk '{print $3}'
+    register: php_extension_dir
+
+  - name: install MongoClient for php
+    shell: printf "\n" | pecl install mongo creates={{php_extension_dir.stdout_lines[0]}}/mongo.so
+
+  - name: make mongo.so executable
+    file: path={{php_extension_dir.stdout_lines[0]}}/mongo.so mode=0755
+
+  - name: add mongo extension to php.ini configuration
+    lineinfile: dest=/etc/php5/cli/php.ini
+                line="extension=mongo.so"
+                state=present
+
+  - name: Install PHPUnit
+    shell: wget https://phar.phpunit.de/phpunit.phar; chmod +x phpunit.phar; mv phpunit.phar /usr/local/bin/phpunit;
+
+  - name: Change default dir
+    lineinfile: dest=/home/vagrant/.bashrc
+              line="cd /vagrant"
+              state=present
+
+  - name: Ensure requested services are on
+    service: name=mongodb state=started
