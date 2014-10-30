@@ -1,6 +1,8 @@
 <?php
 namespace JSomerstone\MongoToken\Model;
 
+use \DateTime;
+
 class Token
 {
     /**
@@ -25,7 +27,7 @@ class Token
      */
     public function __construct(
         DataContainer $data,
-        \DateTime $validThrough = null,
+        DateTime $validThrough = null,
         $token = null)
     {
         $this->data = $data;
@@ -56,13 +58,46 @@ class Token
     }
 
     /**
+     * @return DataContainer
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        if (null === $this->validThrough)
+        {
+            return true;
+        }
+        else
+        {
+            return $this->validThrough->getTimestamp() > time();
+        }
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
      * @return array
      */
     public function toArray()
     {
         return array(
             '__id' => $this->token,
-            'validThrough' => $this->validThrough->format('Y-m-d H:i:s'),
+            'validThrough' => is_null($this->validThrough)
+                ? null
+                : $this->validThrough->format('Y-m-d H:i:s'),
             'data' => $this->data->serialize(),
         );
     }
@@ -73,9 +108,13 @@ class Token
      */
     public static function fromArray(array $tokenArray)
     {
+        $date = is_null($tokenArray['validThrough'])
+            ? null
+            : new DateTime($tokenArray['validThrough']);
+
         return new Token(
             DataContainer::unserialize($tokenArray['data']),
-            new \DateTime($tokenArray['validThrough']),
+            $date,
             $tokenArray['__id']
         );
     }

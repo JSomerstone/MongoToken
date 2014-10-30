@@ -35,7 +35,21 @@ class TokenModelTest extends \PHPUnit_Framework_TestCase
 
         $clone = Token::fromArray($originalToken->toArray());
 
-        $this->assertSame(
+        $this->assertEquals(
+            $originalToken->toArray(),
+            $clone->toArray()
+        );
+    }
+
+    public function testDataPreservationWithoutExpiration()
+    {
+        $originalToken = new Token(
+            new DataContainer(['foo' => 'bar'])
+        );
+
+        $clone = Token::fromArray($originalToken->toArray());
+
+        $this->assertEquals(
             $originalToken->toArray(),
             $clone->toArray()
         );
@@ -43,6 +57,52 @@ class TokenModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateToken()
     {
+        $tokenObj = Token::generateToken(new DataContainer([]));
+        $this->assertNotEmpty($tokenObj->getToken());
+        $this->assertTrue($tokenObj->isValid());
+    }
 
+    /**
+     * @test
+     * @dataProvider provideDateTimesAndValidities
+     */
+    public function testExpiration($dateTime, $expectedValidity)
+    {
+        $data = new DataContainer([]);
+        $token = new Token($data, $dateTime);
+
+        $this->assertEquals(
+            $expectedValidity,
+            $token->isValid()
+        );
+    }
+
+    public function provideDateTimesAndValidities()
+    {
+        return array(
+            [ null, true ],
+            [ new DateTime('+1 second'), true ],
+            [ new DateTime('+1 minute'), true ],
+            [ new DateTime('+1 hour'), true ],
+            [ new DateTime('+1 day'), true ],
+            [ new DateTime('+1 year'), true ],
+            [ new DateTime('-1 second'), false ],
+            [ new DateTime('-1 minute'), false ],
+            [ new DateTime('-1 hour'), false ],
+            [ new DateTime('-1 day'), false ],
+            [ new DateTime('-1 year'), false ],
+        );
+    }
+
+    public function testDataGetter()
+    {
+        $data = new DataContainer(['BD' => new DateTime('2009-10-22')]);
+
+        $tokenObj = new Token($data);
+
+        $this->assertSame(
+            $data,
+            $tokenObj->getData()
+        );
     }
 }
