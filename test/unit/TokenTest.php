@@ -105,4 +105,19 @@ class TokenModelTest extends \PHPUnit_Framework_TestCase
             $tokenObj->getData()
         );
     }
+
+    public function testGeneratedTokensAreUnique()
+    {
+        $generated = array();
+        $emptyData = new DataContainer([]);
+        $numberOfTokens = 1000;
+        while ($numberOfTokens-- > 1)
+        {
+            $token = Token::generateToken($emptyData)->getToken();
+
+            $this->assertFalse(isset($generated[$token]), "Non-unique token encountered");
+
+            $generated[$token] = true;
+        }
+    }
 }
