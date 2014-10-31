@@ -11,7 +11,7 @@ class DataContainer
     /**
      * @param array $properties
      */
-    public function __construct(array $properties)
+    public function __construct(array $properties = array())
     {
         $this->properties = $properties;
     }
@@ -38,6 +38,14 @@ class DataContainer
             return null;
         }
         return $this->properties[$index];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAll()
+    {
+        return $this->properties;
     }
 
     /**

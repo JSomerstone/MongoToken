@@ -10,7 +10,7 @@ class TokenModelTest extends \PHPUnit_Framework_TestCase
     public function testToArray()
     {
         $token = new Token(
-            new DataContainer([]),
+            new DataContainer(),
             new DateTime('2014-10-30 12:34:56'),
             'PSEUDORANDOMTOKEN'
         );
@@ -57,7 +57,7 @@ class TokenModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateToken()
     {
-        $tokenObj = Token::generateToken(new DataContainer([]));
+        $tokenObj = Token::generateToken(new DataContainer());
         $this->assertNotEmpty($tokenObj->getToken());
         $this->assertTrue($tokenObj->isValid());
     }
@@ -68,7 +68,7 @@ class TokenModelTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpiration($dateTime, $expectedValidity)
     {
-        $data = new DataContainer([]);
+        $data = new DataContainer();
         $token = new Token($data, $dateTime);
 
         $this->assertEquals(
@@ -109,7 +109,7 @@ class TokenModelTest extends \PHPUnit_Framework_TestCase
     public function testGeneratedTokensAreUnique()
     {
         $generated = array();
-        $emptyData = new DataContainer([]);
+        $emptyData = new DataContainer();
         $numberOfTokens = 1000;
         while ($numberOfTokens-- > 1)
         {
