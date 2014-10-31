@@ -49,6 +49,16 @@ class DataContainer
     }
 
     /**
+     * Tells if the DataContainer has value in given index
+     * @param string|int $index
+     * @return bool
+     */
+    public function has($index)
+    {
+        return isset($this->properties[$index]);
+    }
+
+    /**
      * Serialized the data inside container
      * @return string
      */

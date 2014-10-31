@@ -76,4 +76,21 @@ class DataContainerTest extends \PHPUnit_Framework_TestCase
             $output
         );
     }
+
+    public function testHas()
+    {
+        $this->dataContainer->set('some-index', true);
+
+        $this->assertTrue($this->dataContainer->has('some-index'));
+        $this->assertFalse($this->dataContainer->has('none-existing'));
+    }
+
+    public function testHasAfterClearing()
+    {
+        $this->dataContainer->set('abba', 'A band');
+        $this->assertTrue($this->dataContainer->has('abba'));
+        $this->dataContainer->set('abba', null);
+        $this->assertFalse($this->dataContainer->has('abba'));
+
+    }
 }
